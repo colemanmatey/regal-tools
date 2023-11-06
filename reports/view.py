@@ -42,9 +42,9 @@ def create_worksheet(book):
     return sheet
 
 
-def current_arrears(data, destination=None):
+def template(name, data, destination=None):
     """Template for excel file"""
-    workbook = create_workbook("current_arrears", destination)
+    workbook = create_workbook(name, destination)
     worksheet = create_worksheet(workbook)
 
     # Add formats
@@ -84,7 +84,7 @@ def current_arrears(data, destination=None):
     # Write title and subtitle to the first and second roworksheet respectively
     worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", title_format)
     worksheet.merge_range(1, 0, 1, 4,
-        f"Arrears as at {dt.datetime.today().strftime('%A, %B %d, %Y - %I:%M %p')}",
+        f"{name.title()} Arrears as at {dt.datetime.today().strftime('%A, %B %d, %Y - %I:%M %p')}",
         subtitle_format,
     )
 
