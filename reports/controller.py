@@ -1,27 +1,20 @@
 """
 Controller
 """
-import argparse
 
 import model
 import view
 
 
-def arguments():    
-    parser = argparse.ArgumentParser(
-        prog='regal-tools',
-        description='A simple tool to help me generate reports at Regal International School',
-        epilog='Coleman A. Matey'
-    )
-    parser.add_argument('-a', '--arrears')
-    return parser.parse_args()
-
-
-def main():
-    """The main function"""
-    args = arguments()
+def get_arrears(option):
     conn = model.connect()
-    query = model.read_sql(f'./reports/scripts/{args.arrears}_arrears.sql')
+
+    if option == 'current':
+        file = f'./reports/scripts/current_arrears.sql'
+    elif option == 'previous':
+        file = f'./reports/scripts/previous_arrears.sql'
+     
+    query = model.read_sql(file)
     data = model.fetch_data(conn, query)
-    view.template(args.arrears, data, "desktop")
+    view.template(option, data, "desktop")
     model.disconnect(conn)
