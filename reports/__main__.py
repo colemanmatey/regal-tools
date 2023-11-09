@@ -2,7 +2,7 @@
 """
 import argparse
 
-from controller import get_arrears
+from controller import get_arrears, get_lists
 
 
 def main():
@@ -18,11 +18,14 @@ def main():
         help="Choose the type of arrears: current, previous",
     )
 
+    parser.add_argument('-c', '--classrooms')
+
     args = parser.parse_args()
 
     if args.arrears:
         get_arrears(args.arrears)
-
+    elif args.classrooms:
+        get_lists(args.classrooms)
 
 if __name__ == "__main__":
     main()
