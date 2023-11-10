@@ -2,27 +2,16 @@
 View
 """
 
-import os
-
 import datetime as dt
 import xlsxwriter
 
-
-def destination(location=None):
-    """The location of the output file"""
-    home_dir = os.path.expanduser("~")
-    if location is not None:
-        return os.path.join(home_dir, location)
-
-    if not os.path.exists("out"):
-        os.makedirs("out")
-    return "out"
+import controller
 
 
 def create_workbook(name, location):
     """Create workbook"""
     name = (
-        f"{destination(location)}/{dt.datetime.now().strftime('%y-%m%d')}_{name}.xlsx"
+        f"{controller.destination(location)}/{dt.datetime.now().strftime('%y-%m%d')}_{name}.xlsx"
     )
     book = xlsxwriter.Workbook(name)
     return book
@@ -42,10 +31,8 @@ def create_worksheet(book, sheet_name=None):
     return sheet
 
 
-def arrears(name, data, destination=None):
+def arrears(name, workbook, worksheet, data):
     """Template for an arrears excel file"""
-    workbook = create_workbook(name, destination)
-    worksheet = create_worksheet(workbook)
 
     # Add formats
     title_format = workbook.add_format(
@@ -104,8 +91,6 @@ def arrears(name, data, destination=None):
     last_row = rownum
     worksheet.merge_range(last_row, 0, last_row, 3, "Total:", total_format)
     worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", total_format)
-
-    workbook.close()
 
 
 def lists(cursor, workbook, worksheet, class_list, classroom):

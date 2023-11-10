@@ -2,9 +2,21 @@
 Controller
 """
 
+import os
+
 import model
 import view
 
+
+def destination(location=None):
+    """The location of the output file"""
+    home_dir = os.path.expanduser("~")
+    if location is not None:
+        return os.path.join(home_dir, location)
+
+    if not os.path.exists("out"):
+        os.makedirs("out")
+    return "out"
 
 def get_arrears(option):
     conn = model.connect()
@@ -16,7 +28,11 @@ def get_arrears(option):
      
     query = model.read_sql(file)
     data = model.fetch_data(conn, query)
-    view.arrears(option, data, "desktop")
+
+    workbook = view.create_workbook(option, "desktop")
+    worksheet = view.create_worksheet(workbook)
+    view.arrears(option, workbook, worksheet, data)
+    workbook.close()
     model.disconnect(conn)
 
 
