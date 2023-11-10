@@ -2,7 +2,7 @@ SELECT
 	ROW_NUMBER() OVER (ORDER BY gender DESC, fname, lname) AS 'S/N',
 	admissionNumber AS 'Student No.',
 	CONCAT(fname, ' ', lname) AS 'Name',
-	classid AS 'Class',
+	gender AS 'Gender',
 	feePayable * -1 AS 'Arrears'
 FROM
 	dbo.studentTbl
