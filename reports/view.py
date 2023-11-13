@@ -4,10 +4,9 @@ View
 
 import datetime as dt
 from collections import namedtuple
+
 import xlsxwriter
-
 import controller
-
 
 def create_workbook(name, location):
     """Create workbook"""
@@ -73,19 +72,12 @@ def get_styles(workbook):
 
     # Create an instance of the named tuple
     return Style(title=title, subtitle=subtitle, header=header, row=row, total=total)
-    
 
-def arrears(name, workbook, worksheet, data):
-    """Template for an arrears excel file"""
+
+def write_data(workbook, worksheet, data):
+    """Write the data to cells"""
 
     styles = get_styles(workbook)
-
-    # Write title and subtitle to the first and second roworksheet respectively
-    worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", styles.title)
-    worksheet.merge_range(1, 0, 1, 4,
-        f"{name.title()} Arrears as at {dt.datetime.today().strftime('%A, %B %d, %Y - %I:%M %p')}",
-        styles.subtitle,
-    )
 
     # Create column headers for each worksheet
     columns = [column[0] for column in data.description]
@@ -103,6 +95,22 @@ def arrears(name, workbook, worksheet, data):
     last_row = rownum
     worksheet.merge_range(last_row, 0, last_row, 3, "Total:", styles.total)
     worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", styles.total)
+    
+
+def arrears(name, workbook, worksheet, data):
+    """Template for an arrears excel file"""
+
+    styles = get_styles(workbook)
+
+    # Write title and subtitle to the first and second roworksheet respectively
+    worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", styles.title)
+    worksheet.merge_range(1, 0, 1, 4,
+        f"{name.title()} Arrears as at {dt.datetime.today().strftime('%A, %B %d, %Y - %I:%M %p')}",
+        styles.subtitle,
+    )
+
+    write_data(workbook, worksheet, data)
+    
 
 
 def lists(cursor, workbook, worksheet, class_list, classroom):
