@@ -74,22 +74,28 @@ def get_styles(workbook):
     return Style(title=title, subtitle=subtitle, header=header, row=row, total=total)
 
 
-def write_data(workbook, worksheet, data):
+def write_data(workbook, worksheet, cursor=None, *args):
     """Write the data to cells"""
 
     styles = get_styles(workbook)
 
     # Create column headers for each worksheet
-    columns = [column[0] for column in data.description]
+    columns = [column[0] for column in cursor.description]
 
     # Write table header to the fourth row
     worksheet.write_row(3, 0, columns, styles.header)
 
     # Write data to subsequent roworksheet
     rownum = 4
-    for i in data:
-        worksheet.write_row(rownum, 0, i, styles.row)
-        rownum += 1
+
+    if args:
+        for i in args[0]:
+            worksheet.write_row(rownum, 0, i, styles.row)
+            rownum += 1
+    else:
+        for i in cursor:
+            worksheet.write_row(rownum, 0, i, styles.row)
+            rownum += 1
 
     # Write data to last row for total
     last_row = rownum
@@ -97,7 +103,7 @@ def write_data(workbook, worksheet, data):
     worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", styles.total)
     
 
-def arrears(name, workbook, worksheet, data):
+def arrears(name, workbook, worksheet, cursor):
     """Template for an arrears excel file"""
 
     styles = get_styles(workbook)
@@ -109,11 +115,11 @@ def arrears(name, workbook, worksheet, data):
         styles.subtitle,
     )
 
-    write_data(workbook, worksheet, data)
+    write_data(workbook, worksheet, cursor)
     
 
 
-def lists(cursor, workbook, worksheet, class_list, classroom):
+def classlists(cursor, workbook, worksheet, class_list, classroom):
     """Template for a list"""
 
     styles = get_styles(workbook)
@@ -123,19 +129,4 @@ def lists(cursor, workbook, worksheet, class_list, classroom):
     worksheet.merge_range(1, 0, 1, 4, f"Academic year - 1st Term, {dt.datetime.today().strftime('%Y')}", styles.subtitle)
     worksheet.merge_range(2, 0, 2, 4, classroom.classid, styles.subtitle)
 
-    # Create column headers for each worksheet
-    columns = [column[0] for column in cursor.description]
-
-    # Write table header to the fourth row
-    worksheet.write_row(3, 0, columns, styles.header)
-
-    # Write data to subsequent rows
-    rownum = 4
-    for student in class_list:
-        worksheet.write_row(rownum, 0, student, styles.row)
-        rownum += 1
-
-    # Write data to last row for total
-    last_row = rownum
-    worksheet.merge_range(last_row, 0, last_row, 3, "Total:", styles.total)
-    worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", styles.total)
+    write_data(workbook, worksheet, cursor, class_list)
