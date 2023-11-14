@@ -3,10 +3,10 @@ View
 """
 
 import datetime as dt
+from collections import namedtuple
+
 import xlsxwriter
-
 import controller
-
 
 def create_workbook(name, location):
     """Create workbook"""
@@ -31,11 +31,10 @@ def create_worksheet(book, sheet_name=None):
     return sheet
 
 
-def arrears(name, workbook, worksheet, data):
-    """Template for an arrears excel file"""
-
+def get_styles(workbook):
+    """Template for views"""
     # Add formats
-    title_format = workbook.add_format(
+    title = workbook.add_format(
         {
             "font_size": 16,
             "bold": True,
@@ -45,7 +44,7 @@ def arrears(name, workbook, worksheet, data):
         }
     )
 
-    subtitle_format = workbook.add_format(
+    subtitle = workbook.add_format(
         {
             "font_size": 12,
             "bold": True,
@@ -55,11 +54,11 @@ def arrears(name, workbook, worksheet, data):
         }
     )
 
-    header_format = workbook.add_format({"bold": True, "text_wrap": True, "border": 1})
+    header = workbook.add_format({"bold": True, "text_wrap": True, "border": 1})
 
-    row_format = workbook.add_format({"border": 1, "text_wrap": False})
+    row = workbook.add_format({"border": 1, "text_wrap": False})
 
-    total_format = workbook.add_format(
+    total = workbook.add_format(
         {
             "bold": True,
             "font_size": 12,
@@ -68,85 +67,66 @@ def arrears(name, workbook, worksheet, data):
         }
     )
 
-    # Write title and subtitle to the first and second roworksheet respectively
-    worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", title_format)
-    worksheet.merge_range(1, 0, 1, 4,
-        f"{name.title()} Arrears as at {dt.datetime.today().strftime('%A, %B %d, %Y - %I:%M %p')}",
-        subtitle_format,
-    )
+    # Create a named tuple class for styles
+    Style = namedtuple('Style', ['title', 'subtitle', 'header', 'row', 'total'])
 
-    # Create column headers for each worksheet
-    columns = [column[0] for column in data.description]
-
-    # Write table header to the fourth row
-    worksheet.write_row(3, 0, columns, header_format)
-
-    # Write data to subsequent roworksheet
-    rownum = 4
-    for i in data:
-        worksheet.write_row(rownum, 0, i, row_format)
-        rownum += 1
-
-    # Write data to last row for total
-    last_row = rownum
-    worksheet.merge_range(last_row, 0, last_row, 3, "Total:", total_format)
-    worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", total_format)
+    # Create an instance of the named tuple
+    return Style(title=title, subtitle=subtitle, header=header, row=row, total=total)
 
 
-def lists(cursor, workbook, worksheet, class_list, classroom):
-    """Template for a list"""
-    title_format = workbook.add_format({
-        'font_size': 16,
-        'bold': True,
-        'text_wrap': False,
-        'border': 0,
-        'align': 'center'
-    })
+def write_data(workbook, worksheet, cursor=None, *args):
+    """Write the data to cells"""
 
-    subtitle_format = workbook.add_format({
-        'font_size': 12,
-        'bold': True,
-        'text_wrap': False,
-        'border': 0,
-        'align': 'center'
-    })
-
-    header_format = workbook.add_format({
-        'bold': True,
-        'text_wrap': True,
-        'border': 1
-    })
-
-    row_format = workbook.add_format({
-        'border': 1,
-        'text_wrap': False
-    })
-
-    total_format = workbook.add_format({
-        'bold': True,
-        'font_size': 13,
-        'border': 1,
-        'text_wrap': False,
-    })
-
-    # Write title and subtitle to the first and second roworksheet respectively
-    worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", title_format)
-    worksheet.merge_range(1, 0, 1, 4, f"Academic year - 1st Term, {dt.datetime.today().strftime('%Y')}", subtitle_format)
-    worksheet.merge_range(2, 0, 2, 4, classroom.classid, subtitle_format)
+    styles = get_styles(workbook)
 
     # Create column headers for each worksheet
     columns = [column[0] for column in cursor.description]
 
     # Write table header to the fourth row
-    worksheet.write_row(3, 0, columns, header_format)
+    worksheet.write_row(3, 0, columns, styles.header)
 
-    # Write data to subsequent rows
+    # Write data to subsequent roworksheet
     rownum = 4
-    for student in class_list:
-        worksheet.write_row(rownum, 0, student, row_format)
-        rownum += 1
+
+    if args:
+        for i in args[0]:
+            worksheet.write_row(rownum, 0, i, styles.row)
+            rownum += 1
+    else:
+        for i in cursor:
+            worksheet.write_row(rownum, 0, i, styles.row)
+            rownum += 1
 
     # Write data to last row for total
     last_row = rownum
-    worksheet.merge_range(last_row, 0, last_row, 3, "Total:", total_format)
-    worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", total_format)
+    worksheet.merge_range(last_row, 0, last_row, 3, "Total:", styles.total)
+    worksheet.write(last_row, 4, f"=SUM(E5:E{last_row})", styles.total)
+    
+
+def arrears(name, workbook, worksheet, cursor):
+    """Template for an arrears excel file"""
+
+    styles = get_styles(workbook)
+
+    # Write title and subtitle to the first and second roworksheet respectively
+    worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", styles.title)
+    worksheet.merge_range(1, 0, 1, 4,
+        f"{name.title()} Arrears as at {dt.datetime.today().strftime('%A, %B %d, %Y - %I:%M %p')}",
+        styles.subtitle,
+    )
+
+    write_data(workbook, worksheet, cursor)
+    
+
+
+def classlists(cursor, workbook, worksheet, class_list, classroom):
+    """Template for a list"""
+
+    styles = get_styles(workbook)
+
+    # Write title and subtitle to the first and second roworksheet respectively
+    worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", styles.title)
+    worksheet.merge_range(1, 0, 1, 4, f"Academic year - 1st Term, {dt.datetime.today().strftime('%Y')}", styles.subtitle)
+    worksheet.merge_range(2, 0, 2, 4, classroom.classid, styles.subtitle)
+
+    write_data(workbook, worksheet, cursor, class_list)
