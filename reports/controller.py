@@ -27,11 +27,11 @@ def get_arrears(option):
         file = f'./reports/scripts/previous_arrears.sql'
      
     query = model.read_sql(file)
-    data = model.fetch_data(conn, query)
+    cursor = model.fetch_data(conn, query)
 
     workbook = view.create_workbook(option, "desktop")
     worksheet = view.create_worksheet(workbook)
-    view.arrears(option, workbook, worksheet, data)
+    view.arrears(option, workbook, worksheet, cursor)
     workbook.close()
     model.disconnect(conn)
 
@@ -55,7 +55,7 @@ def get_lists(option):
 
         worksheet = view.create_worksheet(workbook, classroom.classid)
         
-        view.lists(cursor, workbook, worksheet, class_list, classroom)  
+        view.classlists(cursor, workbook, worksheet, class_list, classroom)  
 
     workbook.close()
     model.disconnect(conn)
