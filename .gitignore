@@ -27,3 +27,6 @@ MANIFEST
 
 # IDE
 .vscode/
+
+# Scripts
+activate.sh
