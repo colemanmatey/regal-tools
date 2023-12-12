@@ -2,7 +2,7 @@
 """
 import argparse
 
-from .controller import get_arrears, get_lists
+from regal.controller import get_arrears, get_lists
 
 
 def main():

@@ -126,7 +126,7 @@ def classlists(cursor, workbook, worksheet, class_list, classroom):
 
     # Write title and subtitle to the first and second roworksheet respectively
     worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", styles.title)
-    worksheet.merge_range(1, 0, 1, 4, f"Academic year - 1st Term, {dt.datetime.today().strftime('%Y')}", styles.subtitle)
+    worksheet.merge_range(1, 0, 1, 4, f"Academic year - 1st Term, {dt.datetime.today().strftime('%Y')}/{int(dt.datetime.today().strftime('%Y')) + 1}", styles.subtitle)
     worksheet.merge_range(2, 0, 2, 4, classroom.classid, styles.subtitle)
 
     write_data(workbook, worksheet, cursor, class_list)

@@ -46,14 +46,16 @@ def get_arrears(option):
 
 def get_lists(option):
     conn = model.connect()
+    scripts = get_scripts_directory('scripts')
+
     
-    file = f'./reports/scripts/classes.sql'
+    file = scripts / 'classes.sql'
     query = model.read_sql(file)
     cursor = model.fetch_data(conn, query)
 
     classrooms = cursor.fetchall()
 
-    file = f'./reports/scripts/class_list.sql'
+    file = scripts / 'class_list.sql'
     query = model.read_sql(file)
 
     workbook = view.create_workbook(option, "desktop")
