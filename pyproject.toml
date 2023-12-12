@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "regal"
+version = "0.0.1"
+authors = [
+  { name="Coleman A. Matey", email="me@colemanmatey.com" },
+]
+description = "A small tool for generating reports at my workplace"
+readme = "README.md"
+dependencies = [
+    "python-decouple",
+    "pyodbc",
+    "xlsxwriter",
+]

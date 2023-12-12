@@ -6,12 +6,12 @@ import datetime as dt
 from collections import namedtuple
 
 import xlsxwriter
-import controller
+from . import controller
 
 def create_workbook(name, location):
     """Create workbook"""
     name = (
-        f"{controller.destination(location)}/{dt.datetime.now().strftime('%y-%m%d')}_{name}.xlsx"
+        f"{controller.destination(location)}/{dt.datetime.now().strftime('%y-%m%d%I%M%p')}_{name}.xlsx"
     )
     book = xlsxwriter.Workbook(name)
     return book

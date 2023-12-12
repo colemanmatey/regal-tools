@@ -3,9 +3,10 @@ Controller
 """
 
 import os
+from pathlib import Path
 
-import model
-import view
+from . import model
+from . import view
 
 
 def destination(location=None):
@@ -18,13 +19,20 @@ def destination(location=None):
         os.makedirs("out")
     return "out"
 
+
+def get_scripts_directory(folder):
+    return Path(__file__).resolve().parent / folder
+
+
 def get_arrears(option):
     conn = model.connect()
+    scripts = get_scripts_directory('scripts')
 
     if option == 'current':
-        file = f'./reports/scripts/current_arrears.sql'
+        file = scripts / 'current_arrears.sql'
     elif option == 'previous':
-        file = f'./reports/scripts/previous_arrears.sql'
+        file = scripts / 'previous_arrears.sql'
+
      
     query = model.read_sql(file)
     cursor = model.fetch_data(conn, query)
