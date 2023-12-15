@@ -29,7 +29,7 @@ class DatabaseManager:
                 UID=self.credentials.get_var("DB_USER"),
                 PWD=self.credentials.get_var("DB_PASS")
             )  
-            self.logger.info("Connected to the database successfully.")
+            self.logger.info("Connected to the database.")
         except Exception as e:
             self.logger.exception(f'Could not establish a connection to the database: {e}')
             return None
@@ -68,6 +68,6 @@ class DatabaseManager:
         self.logger.info("Closing database connection")
         try:
             self.connection.close()
-            self.logger.info("Connection to database closed successfully")
+            self.logger.info("Connection to database closed.")
         except AttributeError as e:
             self.logger.error(f"{e}. \nCan't close a database connection that does not exist")
