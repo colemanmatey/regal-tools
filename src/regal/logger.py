@@ -3,18 +3,21 @@ Logger
 """
 
 import logging
+import threading
 
 from pathlib import Path
 
 
 class Logger:
     _instance = None
+    _lock = threading.Lock()
 
     def __new__(cls):
-        if not cls._instance:
-            cls._instance = super(Logger, cls).__new__(cls)
-            cls._instance.log_level = logging.DEBUG
-        return cls._instance
+        with cls._lock:
+            if not cls._instance:
+                cls._instance = super(Logger, cls).__new__(cls)
+                cls._instance.log_level = logging.DEBUG
+            return cls._instance
       
     def get_logger(self):
         # Create logger
