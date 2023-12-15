@@ -3,7 +3,6 @@ Configuration Manager
 """
 
 from pathlib import Path
-
 from regal.logger import Logger
 
 
@@ -12,28 +11,22 @@ class ConfigManager:
     _instance = None
 
     def __new__(cls, filename=None):
-        if not cls._instance:
+        if cls._instance is None:
             cls._instance = super(ConfigManager, cls).__new__(cls)
             cls._instance._filename = cls._instance._base_dir() / filename
-
-            # Initialize logger
-            cls._instance.logger = Logger().get_logger()
-
-            # Load environment variables
+            cls._instance.logger = Logger().logger
             cls._instance._env_vars = cls._instance._load_env_vars()
-
         return cls._instance
 
     def _load_env_vars(self):
         env_vars = dict()
-        self.logger.debug("Loading environment variables from file.")
         try:
             with open(self._filename, 'r') as file:
                 for line in file:
                     key, value = line.strip().split("=")
                     env_vars[key] = value
         except (FileNotFoundError, ValueError) as e:
-            self.logger.exception(f'Error loading environment variables: {e}')
+            self.logger.error(f'Error loading environment variables: {e}')
         else:
             self.logger.info("Environment variables loaded successfully!")
             return env_vars
