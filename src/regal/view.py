@@ -118,7 +118,6 @@ def arrears(name, workbook, worksheet, cursor):
     write_data(workbook, worksheet, cursor)
     
 
-
 def classlists(cursor, workbook, worksheet, class_list, classroom):
     """Template for a list"""
 
@@ -126,7 +125,72 @@ def classlists(cursor, workbook, worksheet, class_list, classroom):
 
     # Write title and subtitle to the first and second roworksheet respectively
     worksheet.merge_range(0, 0, 0, 4, "REGAL INTERNATIONAL SCHOOL", styles.title)
-    worksheet.merge_range(1, 0, 1, 4, f"Academic year - 1st Term, {dt.datetime.today().strftime('%Y')}/{int(dt.datetime.today().strftime('%Y')) + 1}", styles.subtitle)
+    worksheet.merge_range(1, 0, 1, 4, f"Academic year - 2nd Term, {dt.datetime.today().strftime('%Y')}/{int(dt.datetime.today().strftime('%Y')) + 1}", styles.subtitle)
     worksheet.merge_range(2, 0, 2, 4, classroom.classid, styles.subtitle)
 
     write_data(workbook, worksheet, cursor, class_list)
+
+
+# def schedules(cursor, workbook, class_list, each_class):
+def schedules(cursor, workbook, worksheet, class_list, classroom):
+    """Insert class lists in excel workbook"""
+        
+    title_format = workbook.add_format({
+        'font_size': 16,
+        'bold': True,
+        'text_wrap': False,
+        'border': 0,
+        'align': 'center'
+    })
+
+    subtitle_format = workbook.add_format({
+        'font_size': 12,
+        'bold': True,
+        'text_wrap': False,
+        'border': 0,
+        'align': 'center'
+    })
+
+    header_format = workbook.add_format({
+        'bold': True,
+        'text_wrap': True,
+        'border': 1
+    })
+
+    row_format = workbook.add_format({
+        'border': 1,
+        'text_wrap': False
+    })
+
+    total_format = workbook.add_format({
+        'bold': True,
+        'font_size': 13,
+        'border': 1,
+        'text_wrap': False,
+    })
+
+    # Write title and subtitle to the first and second row worksheets respectively
+    worksheet.merge_range(0, 0, 0, 7, "REGAL INTERNATIONAL SCHOOL", title_format)
+    worksheet.merge_range(1, 0, 1, 7, f"Academic year - 1st Term, {int(dt.datetime.today().strftime('%Y'))}/{int(dt.datetime.today().strftime('%Y'))+1}", subtitle_format)
+    worksheet.merge_range(2, 0, 2, 7, classroom.classid, subtitle_format)
+
+    # Create column headers for each worksheet
+    columns = [column[0] for column in cursor.description]
+
+    # Write table header to the fourth row
+    worksheet.write_row(3, 0, columns, header_format)
+
+    # Write data to subsequent rows
+    rownum = 4
+    for student in class_list:
+        worksheet.write_row(rownum, 0, student, row_format)
+        rownum += 1
+
+    # Add blank rows to schedule
+    colnum = 0
+    while rownum < 49:
+        worksheet.write(rownum, colnum, rownum - 3, row_format)
+        for i in range(1, 8):
+            worksheet.write(rownum, colnum + i, None, row_format)   
+        rownum += 1
+        

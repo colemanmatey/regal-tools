@@ -20,12 +20,16 @@ def main():
 
     parser.add_argument('-c', '--classrooms')
 
+    parser.add_argument('-s', '--schedules')
+
     args = parser.parse_args()
 
     if args.arrears:
         get_arrears(args.arrears)
     elif args.classrooms:
         get_lists(args.classrooms)
+    elif args.schedules:
+        get_lists(args.schedules)
 
 if __name__ == "__main__":
     main()

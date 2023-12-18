@@ -55,7 +55,10 @@ def get_lists(option):
 
     classrooms = cursor.fetchall()
 
-    file = scripts / 'class_list.sql'
+    if option == "schedules":
+        file = scripts / 'fee_schedules.sql'
+    else:
+        file = scripts / 'class_list.sql'
     query = model.read_sql(file)
 
     workbook = view.create_workbook(option, "desktop")
@@ -64,8 +67,19 @@ def get_lists(option):
         class_list = cursor.fetchall()
 
         worksheet = view.create_worksheet(workbook, classroom.classid)
+        worksheet.set_margins(0.25, 0.25, 0.75, 0.75)
+
+        # Set column widths
+        worksheet.set_column('A:A', 4)
+        worksheet.set_column('B:B', 11)
+        worksheet.set_column('C:C', 42)
+        worksheet.set_column('D:D', 8)
+        worksheet.set_column('E:E', 7)
+        worksheet.set_column('F:F', 7)
+        worksheet.set_column('G:G', 7)
+        worksheet.set_column('H:H', 7)
         
-        view.classlists(cursor, workbook, worksheet, class_list, classroom)  
+        view.schedules(cursor, workbook, worksheet, class_list, classroom)  
 
     workbook.close()
     model.disconnect(conn)
